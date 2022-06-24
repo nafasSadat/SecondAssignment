@@ -1,29 +1,37 @@
 const express = require('express');
+const app = express();
 const { json } = require('express/lib/response');
 const routs=express.Router();
 const con=require('../database/db.js');
+const bodyParser=require('body-parser');
+const cors=require('cors');
 
-// routs.get('/product',(req,res,next)=>{
-//     res.status(200).json({'Msg':'Sucess'});
-// })
+
+
+app.use(cors());
+app.use(express.json());
+app.use(bodyParser.urlencoded({extended:true}))
 
 
 // showing items in cart
-routs.get('/products', (req, res) => {
+routs.get('/cart_items', (req, res) => {
   //  res.writeHead(200,{'Cotent-Type': 'text/json'});
     con.query('SELECT * FROM products',(err,result)=>{
         if(err) throw err;
+        console.log(err)
 
        // res.write(JSON.stringify(result));
-        res.status(200).json({result});
-        console.log(result)
-        res.end();
+        res.send(result);
+        //res.status(200).json({result});
+        //console.log(result);
+        
+        //res.end();
     });
   });
 
 
 // Change quantity of item in cart
-routs.put('/products/edit', (req, res) => {
+routs.put('/cart_items/edit', (req, res) => {
     res.writeHead(200,{'Cotent-Type': 'text/json'});
     let id = req.query.id;
     let quantity=req.query.quantity;
@@ -43,17 +51,17 @@ routs.put('/products/edit', (req, res) => {
 
 
 //Insert new items to cart
-  routs.post('/products/add', (req, res) => {
-    res.writeHead(200,{'Cotent-Type': 'text/json'});
-    let name = req.query.name;
-    let price=req.query.price;
-    let quantity=req.query.quantity;
-    console.log("Name:  "+name+"Price :"+price+"Quantity: "+quantity)
+  routs.post('/cart_items/add', (req, res) => {
+
+    const name = req.body.name;
+    const price=req.body.Price;
+    const quant=req.body.Quantity;
+
+    console.log("Name:  "+name+"Price :"+price+"Quantity: "+quant)
    
     var sql='INSERT INTO products(name,price,quantity) VALUES(?,?,?)';
-    con.query(sql,[name,price,quantity],(err, result)=> {
+    con.query(sql,[name,price,quant],(err, result)=> {
         if (err) throw err;
-
 
         console.log('record inserted');
         res.write(JSON.stringify({'Statuse':'Sucess'}));
@@ -67,7 +75,7 @@ routs.put('/products/edit', (req, res) => {
 
 // Remove items from cart
 
-routs.delete('/products/remove', (req, res) => {
+routs.delete('/cart_items/remove', (req, res) => {
     res.writeHead(200,{'Cotent-Type': 'text/json'});
     let id = req.query.id;
     var sql='DELETE FROM products WHERE id=?';

@@ -9,10 +9,10 @@ var con = mysql.createConnection({
     database: "shoping_card_management"
   });
   
-//   con.connect(function(err) {
-//     if (err) throw err;
-//     console.log("Connected...");
+  con.connect(function(err) {
+    if (err) throw err;
+    console.log("DB Connected...");
 
-//   });
+  });
 
   module.exports=con;
